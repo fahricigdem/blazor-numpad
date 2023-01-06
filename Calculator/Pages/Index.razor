@@ -1,10 +1,131 @@
-﻿@page "/"
+@page "/"
+@using System.Data
 
-<PageTitle>Index</PageTitle>
+<div class="calculator" style="font-size:x-large;">
+    <div style="width: 300px;background: black; color: white; padding:20px;border-radius:20px;">
 
-<h1>Hello, world!</h1>
+        <p class="calculator__display" style="width: 240px; background: black; text-align: right;">@result</p>
+        <div class="calculator__keypad" >
+            <button class="calculator__key" style=" color: black; background: #a5a5a5; font-size: x-large;" @onclick="ClearResult">C</button>
+            <button class="calculator__key" style=" color: black; background: #a5a5a5; font-size: x-large;" @onclick="BackResult">←</button>
+            <button class="calculator__key" style=" color: black; background: #05a515;color:white;" @onclick="CalculateResult">✔️</button>
+            <button class="calculator__key" style="background: #333; color: white; font-size: x-large;" @onclick="() => AddToResult('7')">7</button>
+            <button class="calculator__key" style="background: #333; color: white; font-size: x-large;" @onclick="() => AddToResult('8')">8</button>
+            <button class="calculator__key" style="background: #333; color: white; font-size: x-large;" @onclick="() => AddToResult('9')">9</button>
+            <button class="calculator__key" style="background: #333; color: white; font-size: x-large;" @onclick="() => AddToResult('4')">4</button>
+            <button class="calculator__key" style="background: #333; color: white; font-size: x-large;" @onclick="() => AddToResult('5')">5</button>
+            <button class="calculator__key" style="background: #333; color: white; font-size: x-large;" @onclick="() => AddToResult('6')">6</button>
+            <button class="calculator__key" style="background: #333; color: white; font-size: x-large;" @onclick="() => AddToResult('1')">1</button>
+            <button class="calculator__key" style="background: #333; color: white; font-size: x-large;" @onclick="() => AddToResult('2')">2</button>
+            <button class="calculator__key" style="background: #333; color: white; font-size: x-large;" @onclick="() => AddToResult('3')">3</button>
+            <button class="calculator__key" style="background: #333; color: white; font-size: x-large;" @onclick="() => AddToResult('0')">0</button>
+            <button class="calculator__key" style="background: #f1a33c; font-size: x-large;" @onclick="() => AddToResult('+')">+</button>
+            <button class="calculator__key" style="background: #f1a33c; font-size: x-large;" @onclick="() => AddToResult('-')">-</button>
 
-Welcome to your new app.
+        </div>
+    </div>
+</div>
 
-<SurveyPrompt Title="How is Blazor working for you?" />
+@code {
+    string result = "0";
 
+    void AddToResult(char c)
+    {
+        if (result == "0")
+        {
+            result = "";
+        }
+
+        if ((c == '+' || c == '-'))
+        {
+            if(result.Length == 0) return;
+            if(result.Contains("+") || result.Contains("-")) return;
+        }
+
+        result += c;
+        Console.WriteLine(result);
+
+
+        if (!(c == '+' || c == '-'))
+        {
+            Console.WriteLine(new DataTable().Compute(result, null).ToString());
+            string s = new DataTable().Compute(result, null).ToString();
+            int t = Int32.Parse(s);
+            if (t > 255 || t < 0) result = result.Remove(result.Length - 1);
+        }
+
+        if (result == "") result = "0";
+    }
+
+
+
+    void ClearResult()
+    {
+        result = "0";
+    }
+    void BackResult()
+    {
+        if(result != "")
+        {
+            result = result.Remove(result.Length - 1);
+        }
+        if (result == "") result = "0";
+    }
+
+    void CalculateResult()
+    {
+        if(result.Substring(result.Length - 1) == "+" || result.Substring(result.Length - 1) == "-")
+        {
+            result = result.Remove(result.Length - 1);
+        }
+        try
+        {
+            result = new DataTable().Compute(result, null).ToString();
+        }
+        catch
+        {
+            result = "Error";
+        }
+    }
+}
+
+<style>
+    .calculator {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .calculator__display {
+        width: 240px;
+        height: 60px;
+        font-size: 36px;
+        
+        padding: 0 10px;
+        border: none;
+        background-color: #eee;
+    }
+
+    .calculator__keypad {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        grid-gap: 5px;
+        margin-top: 10px;
+    }
+
+    .calculator__key {
+        width: 80px;
+        height: 80px;
+        font-size: 18px;
+        border-radius: 50%;
+        border: none;
+        background-color: #ddd;
+        cursor: pointer;
+        
+    }
+
+        .calculator__key:hover {
+            background-color: #ddd;
+        }
+
+</style>
